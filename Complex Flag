@@ -1,27 +1,46 @@
 //This code was written to create a flag that required fields from two different tables in a data model and an external file
 //The DM had a main table where the ClientID and Date lived and a dim table where the ProductID lived
 //These two tables were linked together via the OrderID
-//The external file had list of combinations of ClientID, Date, and OrderID that indicated a flagged purchace
+//The external file had list of combinations of ClientID, Date, and OrderID that indicated a flagged order
 //The intention of the script is to use the data from the external file to create a flag where the combination exists in the DM
 
-Sub Flagged(main_table,dim_table,OrderIDfield,Datefield, ClientIDfield)
-Let ExternalFile= 
+Sub Flagged(main_table,dim_table,ProductIDfield,Datefield,ClientIDfield)
+    Let ExternalFile= 
+    
+    NoConcatenate
+    main_temp:
+    Load
+      *
+    Resident $(main_table);
+    
+    LeftJoin
+    Dim:
+    Load
+      *
+    Resident $(dim_table);
+    Drop Table $(main_table);
+    Drop Table $(dim_table);
+    Left Join
+    
+    Load
+      $(ClientIDfield),
+      Date1
+      Key,
+    From $(externalfile);
+    
+    $(main_table):
+    Load
+      if(flag_date=1 and flag_key=1, 1,0) as flagged_order,
+      *;
+    Load
+      if($(Datefield)>=Date1, 1,0) as flag_date,
+      if(Key=source_key, 1,0) as flag_key,
+      *;
+    Load
+      $(ClientIDfield)&'-'&$(ProductIDfield) as source_key,
+      *;
+    Resident main_temp;
 
-  NoConcatenate
-main_temp:
-Load
-*
-Resident $(main_table);
-LeftJoin
-Dim:
-Load
-*
-Resident $(dim_table);
-Drop Table $(main_table);
-Drop Table $(dim_table);
-Left Join
-Load
-ClientID,
-Key,
-Date
-From externalfile
+END SUB;
+
+Call Flagged('FACTS','DIMS','PRODUCT_ID','ORDER_DATE','CLIENT_ID');
