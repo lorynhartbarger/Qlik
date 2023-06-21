@@ -1,2 +1,11 @@
-Let Reload = 
-//partial or history 
+Let Reload =                                     //partial or history 
+Let Folder = 'lib://DataFiles/';                 //this variable can be modified based on the naming convention of the files
+Let FilePath = '.xlsx]';                         //you can put anything that is not dynamic in the naming convention here
+Let History =                                    //number of years to go back
+
+Sub History 
+Let MaxDate = Date(MonthEnd(MinDate)
+
+
+If Reload = 'partial'
+Call History;
