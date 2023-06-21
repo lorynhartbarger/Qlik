@@ -1,0 +1,37 @@
+Let History = 3;
+Let StartYear = year(today())- $(History);
+Let StartMonthNum = 01;
+Let Year = StartYear;
+Let MonthNum = StartMonthNum;
+Let Folder = 'lib://DataFiles/';
+Let FilePath = '.xlsx]';
+
+Sub incremental
+    Do
+    Let FileTest = Folder&MonthNum&'-'&Year&FilePath;
+    If FileTime('$(FileTime)') > 0 Then 
+
+    Facts:
+    Load
+    *,
+    $(MonthNum)  as Month,
+    $(Year)   as Year,
+    From [$(Folder)$(MonthNum)-$(Year)&(FilePath)]
+    (ooxml, embedded lables, header is 1 lines, table is $(year));
+
+    Else 
+    End IF; 
+
+    Let MonthNum = num($(monthnum)+01,'00');
+    Loop Until MonthNum >= 13;
+End Sub;
+
+Call incremental;
+
+Do
+Let MonthNum= '01';
+Let Year = $(year)+1;
+Call incremental;
+Loop Until Year = Year(today())+1;
+
+
