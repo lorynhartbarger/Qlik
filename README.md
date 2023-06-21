@@ -1,2 +1,2 @@
-# Qlik_Scripts
-This repository highlights my Qlik load scripting skills.
+# Qlik Scripts
+This repository highlights Loryn Hartbarger's Qlik load scripting skills.
