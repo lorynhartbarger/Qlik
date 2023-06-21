@@ -1,0 +1,27 @@
+//This code was written to create a flag that required fields from two different tables in a data model and an external file
+//The DM had a main table where the ClientID and Date lived and a dim table where the ProductID lived
+//These two tables were linked together via the OrderID
+//The external file had list of combinations of ClientID, Date, and OrderID that indicated a flagged purchace
+//The intention of the script is to use the data from the external file to create a flag where the combination exists in the DM
+
+Sub Flagged(main_table,dim_table,OrderIDfield,Datefield, ClientIDfield)
+Let ExternalFile= 
+
+  NoConcatenate
+main_temp:
+Load
+*
+Resident $(main_table);
+LeftJoin
+Dim:
+Load
+*
+Resident $(dim_table);
+Drop Table $(main_table);
+Drop Table $(dim_table);
+Left Join
+Load
+ClientID,
+Key,
+Date
+From externalfile
