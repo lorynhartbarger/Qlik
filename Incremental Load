@@ -1,15 +1,17 @@
-Let History = 3;
+//This script can be used to load data from multiple files in a filepath when from filepath/* is not an option
+
+Let History = ; //this variable defines how far back to grab files in terms of years
 Let StartYear = year(today())- $(History);
 Let StartMonthNum = 01;
 Let Year = StartYear;
 Let MonthNum = StartMonthNum;
-Let Folder = 'lib://DataFiles/';
-Let FilePath = '.xlsx]';
+Let Folder = 'lib://DataFiles/'; //this variable can be modified based on the naming convention of the files
+Let FilePath = '.xlsx]'; //you can put anything that is not dynamic in the naming convention here
 
-Sub incremental
+Sub incremental //this sub grabs file data from the ealiest year starting in January 
     Do
-    Let FileTest = Folder&MonthNum&'-'&Year&FilePath;
-    If FileTime('$(FileTime)') > 0 Then 
+    Let FileTest = Folder&MonthNum&'-'&Year&FilePath; //FileTim can be used to evaluate the existance of a file
+    If FileTime('$(FileTime)') > 0 Then //if a file is found that matches the file test, the sub will grab the data
 
     Facts:
     Load
@@ -22,13 +24,13 @@ Sub incremental
     Else 
     End IF; 
 
-    Let MonthNum = num($(monthnum)+01,'00');
+    Let MonthNum = num($(monthnum)+01,'00'); 
     Loop Until MonthNum >= 13;
 End Sub;
 
 Call incremental;
 
-Do
+Do //this loop repeates the incremental sub through all years defined in the variable
 Let MonthNum= '01';
 Let Year = $(year)+1;
 Call incremental;
