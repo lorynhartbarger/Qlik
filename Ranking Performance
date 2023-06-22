@@ -1,1 +1,43 @@
+/*This project uses the function firstsortedvalue to find the top and bottom sales people by 
+total revenue and volume of sales across multiple business units*/
+
+Main:
+Load
+  PurchaseID,
+  1 as flag_purchase,
+  ProductID,
+  SalesPersonID
+From filepath;
+Join
+Dims:
+  Load
+  SalesPersonID,
+  Name,
+  BusinessUnit,
+  Region
+From filepath;
+
+//Total Sales and Volume by SalesPerson
+SalesPeople:
+Load
+  Name,
+  sum(flag_purchase) as sp_volume,
+  sum(revenue) as sp_revenue,
+Resident Main
+Group By Name;
+
+//Top and Bottom Sales People 
+Top_SalesPerson:
+Load
+  Firstsortedvalue("Name",-sp_volume) as top1_sp_vol,
+  Firstsortedvalue("Name",-sp_volume,2) as top2_sp_vol,
+  Firstsortedvalue("Name",sp_volume) as bottom_sp_vol,
+  Firstsortedvalue("Name",-sp_revenue) as top1_sp_rev,
+  Firstsortedvalue("Name",sp_revenue) as bottom_sp_rev,
+  Firstsortedvalue("Name",-sp_revenue,2) as top2_sp_rev
+Resident SalesPeople;
+
+
+
+
 
