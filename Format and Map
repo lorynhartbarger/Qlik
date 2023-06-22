@@ -1,13 +1,21 @@
-/*This project takes customer information and maps to a purchase status
-The code uses subfield, mid, and index to normalize the store name to map to the purchase status information for the right store */
+/*This project takes customer information and maps to a business unit.
+The code uses subfield, mid, and index to normalize the store location to map the purchase information for the right business unit.
+The store location contains the store name somewhere in the string contained in parenthesis */
 
 Load
   FirstName,
   LastName,
   FirstName&' '&LastName as "Customer Name",
+  Purchase_Status,
   Age,
   Gender,
   Email,
-  Subfield(Mid("StoreLocation",Index("StoreLocation,')')+1),')',1) as Store,
+  Subfield(Mid("StoreLocation",Index("StoreLocation,')')+1),')',1) as Store, //this graps the store name between '( )'
   StoreLocation
 From filepath;
+
+Load
+  Store,
+  Business Unit
+From filepath;
+  
