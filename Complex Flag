@@ -4,11 +4,13 @@
 //The external file had list of combinations of ClientID, Date, and OrderID that indicated a flagged order
 //The intention of the script is to use the data from the external file to create a flag where the combination exists in the DM
 
+//add this script to the end of your DM without having to edit original DM
+
 Sub Flagged(main_table,dim_table,ProductIDfield,Datefield,ClientIDfield)
-    Let ExternalFile= 
+    Let ExternalFile=                             //set the filepath of the external file here
     
-    NoConcatenate
-    main_temp:
+    NoConcatenate                                 //to combine the data from connected tables, use a join to concatinate fields
+    main_temp:                                    //aliase the main table. The original main is dropped along with the original dim table
     Load
       *
     Resident $(main_table);
@@ -22,22 +24,22 @@ Sub Flagged(main_table,dim_table,ProductIDfield,Datefield,ClientIDfield)
     Drop Table $(dim_table);
     Left Join
     
-    Load
+    Load                                           //load data from the external file (dependent on connecting field to DM, in this case ClientID)
       $(ClientIDfield),
       Date1
-      Key,
+      Key,                                         //this key looks like ClientID-ProductID
     From $(externalfile);
     
     $(main_table):
     Load
-      if(flag_date=1 and flag_key=1, 1,0) as flagged_order,
+      if(flag_date=1 and flag_key=1, 1,0) as flagged_order,   //this is the flag that can be used to indentify flagged orders in the app
       *;
     Load
-      if($(Datefield)>=Date1, 1,0) as flag_date,
-      if(Key=source_key, 1,0) as flag_key,
+      if($(Datefield)>=Date1, 1,0) as flag_date,              //create a flag to identify if the source key = the external key
+      if(Key=source_key, 1,0) as flag_key,                    //create a flag to identify if the source date is >= to the external date
       *;
     Load
-      $(ClientIDfield)&'-'&$(ProductIDfield) as source_key,
+      $(ClientIDfield)&'-'&$(ProductIDfield) as source_key,    //create a source key to match to the external key
       *;
     Resident main_temp;
 
