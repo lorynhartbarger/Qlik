@@ -1,5 +1,5 @@
 /*For this project, I have been given a data set that contains info about customer transactions for an e-commerce company.
-My task is to perform customer segmentation and churn analysis */ 
+My task is to perform customer segmentation and churn analysis. */ 
 
 Transactions:                   //loading in the main transactional data
 Load
