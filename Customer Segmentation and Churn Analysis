@@ -1,7 +1,7 @@
 /*For this project, I have been given a data set that contains info about customer transactions for an e-commerce company.
 My task is to perform customer segmentation and churn analysis */ 
 
-Transactions:
+Transactions:                   //loading in the main transactional data
 Load
   CustomerID,
   count
@@ -13,19 +13,19 @@ Load
   "Total Purchace Amt"
 From Filesource;
 
-Total_Customers:
+Total_Customers:                //creating a count of total unique customers
 Load Distinct
   CustomerID
 Resident Transactions;
 
-"Customer Totals":
+"Customer Totals":              //how much has each customer spent
 Load
   CustomerID,
   Sum("Total Purchace Amt") as customer_total,
 Resident Transaction
 Groub By CustomerID;
 
-"Customer Segmentation":
+"Customer Segmentation":        //ranking customers by total spend
 Load
   CustomerID,
   If(customer_total >= 10000, 'High Value Customer',
@@ -33,17 +33,24 @@ Load
       'Low Value Customer')) as customer_segmentation
 Resident "Customer Totals";
 
-"Churned Customers":
+"Last Purchase Date":
+LOAD
+    CustomerID,
+    Max(Date) as LastPurchase
+Resident Transactions
+Group By CustomerID;
+
+"Churned Customers":            //determining which customers have not made a purchase in the last 6 months
 Load 
   Distinct CustomerID,
   1 as flag_churned_customer
-Resident Transactions
-Where Date >= AddMonths(Today(),-6));
+Resident "Last Purchase Date"
+Where LastPurchase <= AddMonths(Today(),-6));
 
 Let TotalCustomers = NoOfRows('Total_Customers');
 Drop table Total_Customers;
 
-"Churn Rate":
+"Churn Rate":                  //determining the churn rate aka what % of customers have not made a purchace in last 6 months
 Load
 (sum(flag_churned_customer)/$(TotalCustomers))*100 as ChurnRate
 Resident "Churned Customers";
