@@ -2,30 +2,51 @@
 This code can be added to an already existing data model given that the date field is already present in the DM. */
 
 Sub DateFlags(DateField,Source_Table)
-
-  Load
+  Load  
     //create a flag for the current week
-    If( Week($(DateField)) = Week(Today()) AND Year($(DateField)) = Year(Today()), 1,0) as $(DateField).ThisWeek,
+    If( Week($(DateField)) = Week(Today()) AND $(DateField).ThisYear = 1, 1,0) as $(DateField).ThisWeek,
     
     //create a flag for the previous week
-    If( Week($(DateField)) = (Week(Today())-1) AND Year($(DateField)) = Year(Today()), 1,0) as $(DateField).LastWeek,
+    If( Week($(DateField)) = (Week(Today())-1) AND $(DateField).ThisYear = 1, 1,0) as $(DateField).LastWeek,
     
     //create a flag for the same week num of the previous year of last completed week
-    If( Week($(DateField)) = (Week(Today())-1) AND Year($(DateField)) = (Year(Today())-1), 1,0) as $(DateField).LastWeek,
+    If( Week($(DateField)) = (Week(Today())-1) AND $(DateField).LastYear = 1, 1,0) as $(DateField).LastWeek,
     
     //create a flag for the current month
-    If( Month($(DateField)) = Month(Today()) AND Year($(DateField)) = Year(Today()), 1,0) as $(DateField).ThisMonth,
+    If( Month($(DateField)) = Month(Today()) AND $(DateField).ThisYear = 1, 1,0) as $(DateField).ThisMonth,
     
     //create a flag for last month. this will be used in the app to look at last completed month comparisons 
-    If(Month($(DateField)) = Month(AddMonths(Today(), -1)) AND Year($(DateField)) = Year(Today()), 1,0) as $(DateField).LastMonth,
+    If(Month($(DateField)) = Month(AddMonths(Today(), -1)) AND $(DateField).ThisYear = 1, 1,0) as $(DateField).LastMonth,
     
     //create a flag for the last month but for the prior year. this will be used in YoY comparisons of complete months.
-    If(Month($(DateField)) = Month(AddMonths(Today(), -1)) AND Year($(DateField)) = (Year(Today())-1), 1,0) as $(DateField).CompLastMonth 
+    If(Month($(DateField)) = Month(AddMonths(Today(), -1)) AND $(DateField).LastYear = 1, 1,0) as $(DateField).CompLastMonth,
+
+    *;
+  Load
+    //create a flag for the current year
+    If( Year($(DateField)) = Year(Today()), 1,0) as $(DateField).ThisYear,
+
+    //create a flag for the previous year
+    If( Year($(DateField)) = (Year(Today())-1), 1,0) as $(DateField).LastYear
   Resident $(Source_Table);
 
 End Sub;
 
 Call DateFlags('Date','FACTS');
+
+/* How to use these flags in the app to do analysis */
+
+//create a master item for total revenue
+Sum(Revenue) //this will be called Total_Revenue 
+
+//create a master item for revenue for the current year using set analysis and master items
+{<Date.ThisYear= {'1'}>}Total_Revenue //this will be called Total_Revenue&'_'&year(today()) 
+                                      //since the current year is 2023, I will refer to it as Total_Revenue_2023 in further calcs
+
+/create a master item for revenue for the previous year using set analysis and master items
+{<Date.LastYear= {'1'}>}Total_Revenue //this will be called Total_Revenue&'_'&(year(today())-1) 
+                                      //since the current year is 2023, I will refer to it as Total_Revenue_2022 in further calcs
+
 
 
 
