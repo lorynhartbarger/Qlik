@@ -1,12 +1,33 @@
 /* For this project, I will be creating flags that can be used in the app to compare different date ranges.
 This code can be added to an already existing data model given that the date field is already present in the DM. */
 
-Call Flagged('FACTS','DIMS','PRODUCT_ID','ORDER_DATE','CLIENT_ID');
-
 Sub DateFlags(DateField,Source_Table)
 
-Load
-WeekStart(
+  Load
+    //create a flag for the current week
+    If( Week($(DateField)) = Week(Today()) AND Year($(DateField)) = Year(Today()), 1,0) as $(DateField).ThisWeek,
+    
+    //create a flag for the previous week
+    If( Week($(DateField)) = (Week(Today())-1) AND Year($(DateField)) = Year(Today()), 1,0) as $(DateField).LastWeek,
+    
+    //create a flag for the same week num of the previous year of last completed week
+    If( Week($(DateField)) = (Week(Today())-1) AND Year($(DateField)) = (Year(Today())-1), 1,0) as $(DateField).LastWeek,
+    
+    //create a flag for the current month
+    If( Month($(DateField)) = Month(Today()) AND Year($(DateField)) = Year(Today()), 1,0) as $(DateField).ThisMonth,
+    
+    //create a flag for last month. this will be used in the app to look at last completed month comparisons 
+    If(Month($(DateField)) = Month(AddMonths(Today(), -1)) AND Year($(DateField)) = Year(Today()), 1,0) as $(DateField).LastMonth,
+    
+    //create a flag for the last month but for the prior year. this will be used in YoY comparisons of complete months.
+    If(Month($(DateField)) = Month(AddMonths(Today(), -1)) AND Year($(DateField)) = (Year(Today())-1), 1,0) as $(DateField).CompLastMonth 
+  Resident $(Source_Table);
+
+End Sub;
+
+Call DateFlags('Date','FACTS');
+
+
 
 
 
