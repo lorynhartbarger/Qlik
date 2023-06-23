@@ -1,8 +1,12 @@
 /* For this project, I will be creating flags that can be used in the app to compare different date ranges.
 This code can be added to an already existing data model given that the date field is already present in the DM. */
 
-Sub DateFlags(DateField,'Source_Table'
+Call Flagged('FACTS','DIMS','PRODUCT_ID','ORDER_DATE','CLIENT_ID');
+
+Sub DateFlags(DateField,Source_Table)
+
 Load
+WeekStart(
 
 
 
