@@ -43,9 +43,32 @@ Sum(Revenue) //this will be called Total_Revenue
 {<Date.ThisYear= {'1'}>}Total_Revenue //this will be called Total_Revenue&'_'&year(today()) 
                                       //since the current year is 2023, I will refer to it as Total_Revenue_2023 in further calcs
 
-/create a master item for revenue for the previous year using set analysis and master items
+//create a master item for revenue for the previous year using set analysis and master items
 {<Date.LastYear= {'1'}>}Total_Revenue //this will be called Total_Revenue&'_'&(year(today())-1) 
                                       //since the current year is 2023, I will refer to it as Total_Revenue_2022 in further calcs
+
+//create a master item for the difference in revenue from the current year to the prior
+[Total_Revenue_2023]-[Total_Revenue_2022] // this will be called Total_Rev_YoY_Dif
+
+//create a master item to find the % difference in revenue from the current year to prior
+[Total_Rev_YoY_Dif]/[Total_Revenue_2022] //this will be called %Dif_Rev_YoY
+
+/* Now you can create a KPI for the total revenue of the current year using Total_Revenue_2023
+add a subtitle to the kpi using the following script */
+If( %Dif_Rev_YoY >0, 'Total Revenue for '&year(today())&' is up by '
+&num(%Dif_Ref_YoY, '##.#%')&' (+'&num(Total_Rev_YoY_Dif, '$#,###)
+&') compared to '&year(today())-1&'.',
+  If( %Dif_Rev_YoY <0, 'Total Revenue for '&year(today())&' is down by '
+  &num(%Dif_Ref_YoY, '##.#%')&' (-'&num(Total_Rev_YoY_Dif, '$#,###)
+  &') compared to '&year(today())-1&'.',
+    If( %Dif_Rev_YoY =0, 'Total Revenue has not shifted compared to '&year(today())-1&'.')
+
+/*This would possible result in a kpi subtitle saying:
+Total Revenue for 2023 is up by 1.5% (+$10,576) compared to 2022.
+This logic can be applied using any of the flags we created above. 
+You can look at last completed month to the previous or the same month of the previous year for example */
+
+
 
 
 
