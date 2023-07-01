@@ -1,4 +1,4 @@
-//This script can be used to load data from multiple files in a filepath when from filepath/* is not an option
+//This script can be used to load data from multiple files in a filepath when ' FROM  filepath/* ' is not an option
 
 Let History = ; //this variable defines how far back to grab files in terms of years
 Let StartYear = year(today())- $(History);
