@@ -1,0 +1,119 @@
+/* SALES ANALYSIS AND GROWTH TRACKING: IDENTIFY TOP SALES REPS, PRODUCTS, AND PERIODS 
+Task: Using a data set that contains info on company sales including sales reps, products, 
+order dates, and sales amounts, write a Qlik load script that will calculate the following:
+
+-- Monthly sales growth for each sales rep and product 
+-- The sales rep and product with the highest over all sales growth
+-- The month and year with the highest sales growth across all sales reps and  products */
+
+FACTS:
+Load 
+    order_id,
+    product_id,
+    salesman_id,
+    business_unit_id, 
+    sales,
+    order_date,
+    month(orderdate) as Month,
+    year(orderdate) as Year
+From 
+    ORDERS;
+
+//calculate the monthly sales by salesman, product, month, and year
+Sales:
+Load
+    salesman_id,
+    product_id,
+    Month,
+    Year,
+    sum(sales) as "Monthly Sales"
+Resident 
+    FACTS
+Group By 
+    salesman_id, product_id, Month, Year;
+
+
+//calculate sales growth rate for each sales person. product, month, and year
+Sales_Growth:
+Load
+    salesman_id,
+    product_id,
+    Month,
+    Year,
+    ("Monthly Sales" - PEEK("Monthly Sales")) / PEEK("Monthly Sales") as Sales_Growth_Rate
+Resident 
+    Sales
+Order By 
+    salesman_id,
+    product_id,
+    Year,
+    Month;
+
+//calculate the overall growth for each salesman and product
+Overall_Growth:
+Load
+    salesman_id,
+    product_id,
+    sum(Sales_Growth_Rate) as Overall_Growth
+Resident 
+    Sales_Growth
+Group By
+    salesman_id, product_id;
+
+//idenify the max overall growth
+Top_Growth:
+Load
+    Max(Overall_Growth) as Top_Growth
+Resident 
+    Overall_Growth;
+
+LET vTopGrowth = Peek('Top_Growth', 0, 'Top_Growth');
+
+//identify the sales person and product with the highest overall growth
+Top_Salesman:
+Load
+    salesman_id,
+    product_id
+Resident 
+    Overall_Growth
+Where 
+    "Overall Growth" = $(vTopGrowth);
+
+//calculate monthly growth for each month and year
+Monthly_Growth:
+Load
+      Monthly,
+      Year,
+      Sum(Sales_Growth_Rate) as Monthly_Growth
+Resident 
+      Sales_Growth
+Group By Year, Month;
+
+//identify the month and year with the highest growth
+Top_Month:
+Load
+      Max(Monthly_Growth) as MaxGrowth
+Resident 
+      Monthly_Growth;
+
+LET vMaxGrowth = Peek ('MaxGrowth', 0, 'Top_Month');
+
+//identify the month and year with the highest growth
+Top_Period;
+Load
+      Month,
+      Year
+Resident Monthly_Growth
+Where Monthly_Growth = $(vMaxGrowth);
+
+Drop Tables Top_Growth, Top_Month, Monthly_Growth, Overall_Growth, Sales_Growth, Sales;
+
+
+    
+    
+
+
+
+
+
+
