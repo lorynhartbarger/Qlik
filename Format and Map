@@ -10,7 +10,7 @@ Load
   Age,
   Gender,
   Email,
-  Subfield(Mid("StoreLocation",Index("StoreLocation,')')+1),')',1) as Store, //this graps the store name between '( )'
+  Subfield(Mid("StoreLocation",Index("StoreLocation,')')+1),')',1) as Store, //this grabs the store name between '( )'
   StoreLocation
 From filepath;
 
